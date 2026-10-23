@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Image</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card-hover: #273449;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2340 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 800px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transition: border-color .2s;
+        }
+
+        .card:hover { border-color: var(--accent); }
+
+        .card h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 .icon {
+            display: inline-flex;
+            width: 32px;
+            height: 32px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(99, 102, 241, .15);
+            font-size: 1rem;
+        }
+
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--muted);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, .05);
+            color: var(--text);
+        }
+
+        .dropzone input { display: none; }
+
+        .dropzone .dz-icon { font-size: 2rem; margin-bottom: 8px; }
+        .dropzone .dz-hint { font-size: .85rem; margin-top: 6px; opacity: .7; }
+
+        .preview {
+            display: none;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .preview .file-info {
+            font-size: .8rem;
+            color: var(--muted);
+            margin-top: 6px;
+            word-break: break-all;
+        }
+
+        .input {
+            padding: 12px 14px;
+            width: 100%;
+            background: #0f172a;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: .95rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            padding: 12px 14px;
+            background: #0f172a;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: .95rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        textarea:focus { border-color: var(--accent); }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .2s, transform .1s;
+        }
+
+        button:hover:not(:disabled) { background: var(--accent-hover); }
+        button:active:not(:disabled) { transform: scale(.98); }
+        button:disabled { opacity: .5; cursor: not-allowed; }
+
+        .status {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: .9rem;
+            display: none;
+            word-break: break-word;
+        }
+
+        .status.success { display: block; background: rgba(16, 185, 129, .12); color: var(--success); }
+        .status.error   { display: block; background: rgba(239, 68, 68, .12); color: var(--error); }
+
+        .result-box {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            font-family: monospace;
+            font-size: .9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: .85rem;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Steganography Image</h1>
+        <p>Спрячьте текст внутри изображения — и извлеките его обратно</p>
+    </header>
+
+    <div class="grid">
+
+        <!-- ===== ENCODE ===== -->
+        <div class="card">
+            <h2><span class="icon">🔒</span> Закодировать</h2>
+
+            <label class="dropzone" id="encodeDrop">
+                <input type="file" id="encodeFile" accept="image/png,image/bmp,image/jpeg">
+                <div class="dz-icon">📁</div>
+                <div>Перетащите картинку сюда или нажмите</div>
+                <div class="dz-hint">PNG / BMP / JPEG (результат — PNG)</div>
+            </label>
+
+            <div class="preview" id="encodePreview">
+                <img id="encodePreviewImg" alt="">
+                <div class="file-info" id="encodeFileInfo"></div>
+            </div>
+
+            <textarea id="encodeText" placeholder="Введите текст, который нужно спрятать в изображении..."></textarea>
+
+            <input id="encodeKey" class="input" placeholder="Введите ключ для шифрования...">
+
+            <button id="encodeBtn">Закодировать и скачать</button>
+
+            <div class="status" id="encodeStatus"></div>
+        </div>
+
+        <!-- ===== DECODE ===== -->
+        <div class="card">
+            <h2><span class="icon">🔓</span> Декодировать</h2>
+
+            <label class="dropzone" id="decodeDrop">
+                <input type="file" id="decodeFile" accept="image/png,image/bmp">
+                <div class="dz-icon">🖼️</div>
+                <div>Перетащите закодированную картинку</div>
+                <div class="dz-hint">PNG / BMP (lossless!)</div>
+            </label>
+
+            <div class="preview" id="decodePreview">
+                <img id="decodePreviewImg" alt="">
+                <div class="file-info" id="decodeFileInfo"></div>
+            </div>
+
+            <input id="decodeKey" class="input" placeholder="Введите ключ для расшифровки...">
+
+            <button id="decodeBtn">Извлечь текст</button>
+
+            <div class="status" id="decodeStatus"></div>
+            <div class="result-box" id="decodeResult"></div>
+        </div>
+
+    </div>
+
+    <footer>Spring Boot · Steganography Image</footer>
+</div>
+
+<script>
+    /* ---------- Утилиты ---------- */
+    function setupDropzone(dropId, inputId, previewId, imgId, infoId) {
+        const drop = document.getElementById(dropId);
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const img = document.getElementById(imgId);
+        const info = document.getElementById(infoId);
+
+        function showFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Нужен файл изображения');
+                return;
+            }
+            input.files = toFileList(file);
+            img.src = URL.createObjectURL(file);
+            info.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} КБ)`;
+            preview.style.display = 'block';
+        }
+
+        // чтобы вручную установить file в input
+        function toFileList(file) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            return dt.files;
+        }
+
+        drop.addEventListener('click', (e) => {
+            if (e.target !== input) input.click();
+        });
+
+        input.addEventListener('change', () => showFile(input.files[0]));
+
+        ['dragenter', 'dragover'].forEach(ev =>
+            drop.addEventListener(ev, e => {
+                e.preventDefault();
+                drop.classList.add('dragover');
+            })
+        );
+        ['dragleave', 'drop'].forEach(ev =>
+            drop.addEventListener(ev, e => {
+                e.preventDefault();
+                drop.classList.remove('dragover');
+            })
+        );
+        drop.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            showFile(file);
+        });
+    }
+
+    setupDropzone('encodeDrop', 'encodeFile', 'encodePreview', 'encodePreviewImg', 'encodeFileInfo');
+    setupDropzone('decodeDrop', 'decodeFile', 'decodePreview', 'decodePreviewImg', 'decodeFileInfo');
+
+    function setStatus(el, type, msg) {
+        el.className = 'status ' + type;
+        el.textContent = msg;
+    }
+
+    function setLoading(btn, loading, text) {
+        btn.disabled = loading;
+        btn.innerHTML = loading ? `<span class="spinner"></span>${text}` : text;
+    }
+
+    async function readError(resp) {
+        try {
+            const json = await resp.json();
+            return json.message || 'Ошибка сервера';
+        } catch {
+            return `Ошибка ${resp.status}`;
+        }
+    }
+
+    /* ---------- ENCODE ---------- */
+    document.getElementById('encodeBtn').addEventListener('click', async () => {
+        const file = document.getElementById('encodeFile').files[0];
+        const text = document.getElementById('encodeText').value.trim();
+        const key = document.getElementById('encodeKey').value.trim();
+        const status = document.getElementById('encodeStatus');
+        const btn = document.getElementById('encodeBtn');
+
+        if (!file) return setStatus(status, 'error', 'Выберите изображение');
+        if (!text) return setStatus(status, 'error', 'Введите текст для сокрытия');
+        if (!key) return setStatus(status, 'error', 'Введите ключ для шифрования');
+
+        const fd = new FormData();
+        fd.append('image', file);
+        fd.append('text', text);
+        fd.append('key', key);
+
+        setLoading(btn, true, 'Кодирование...');
+        try {
+            const resp = await fetch('/api/encode', { method: 'POST', body: fd });
+            if (!resp.ok) throw new Error(await readError(resp));
+
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'encoded_' + (file.name.replace(/\.[^.]+$/, '') || 'image') + '.png';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+
+            setStatus(status, 'success', 'Готово! Файл скачан.');
+        } catch (err) {
+            setStatus(status, 'error', 'Ошибка: ' + err.message);
+        } finally {
+            setLoading(btn, false, 'Закодировать и скачать');
+        }
+    });
+
+    /* ---------- DECODE ---------- */
+    document.getElementById('decodeBtn').addEventListener('click', async () => {
+        const file = document.getElementById('decodeFile').files[0];
+        const key = document.getElementById('decodeKey').value.trim();
+        const status = document.getElementById('decodeStatus');
+        const result = document.getElementById('decodeResult');
+        const btn = document.getElementById('decodeBtn');
+
+        if (!file) return setStatus(status, 'error', 'Выберите изображение');
+
+        const fd = new FormData();
+        fd.append('image', file);
+        if (key) fd.append('key', key);
+
+        setLoading(btn, true, 'Извлечение...');
+        result.style.display = 'none';
+        status.className = 'status';
+        try {
+            const resp = await fetch('/api/decode', { method: 'POST', body: fd });
+            if (!resp.ok) {
+                throw new Error(await readError(resp));
+            }
+            const text = await resp.text();
+
+            result.textContent = text || '(пусто)';
+            result.style.display = 'block';
+            setStatus(status, 'success', 'Текст успешно извлечён');
+        } catch (err) {
+            setStatus(status, 'error', 'Ошибка: ' + err.message);
+        } finally {
+            setLoading(btn, false, 'Извлечь текст');
+        }
+    });
+</script>
+</body>
+</html>
