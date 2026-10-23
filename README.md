@@ -18,16 +18,23 @@
 ---
 ## Скриншоты
 
-![Интерфейс](docs/screenshots/home page.png)
+<table>
+  <tr>
+    <td align="center"><b>Главная страница</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/home page.png" alt="Главная страница"/></td>
+  </tr>
+</table>
 
 <table>
-<tr>
+  <tr>
     <td align="center"><b>Закодировать текст</b></td>
     <td align="center"><b>Декодировать текст</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/encode.png" alt="главная страница"/></td>
-    <td><img src="docs/screenshots/decode.png" alt="Пустая страница загрузок"/></td>
+    <td><img src="docs/screenshots/encode.png" alt="Закодировать текст"/></td>
+    <td><img src="docs/screenshots/decode.png" alt="Декодировать текст"/></td>
   </tr>
 </table>
 
