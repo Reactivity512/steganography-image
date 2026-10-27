@@ -41,3 +41,49 @@ jobs:
           name: pmd-report
           path: target/pmd.xml
           if-no-files-found: ignore
+
+      # 1. Кэширование данных NVD (чтобы не скачивать базу каждый раз)
+      - name: Cache NVD data
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: ${{ runner.os }}-nvd-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-nvd-
+
+      # 2. Единый шаг статического анализа (Error Prone, SpotBugs, PMD, OWASP)
+      - name: Run Static Analysis & OWASP Dependency-Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }} # Рекомендуется создать секрет
+        run: |
+          mvn -B -ntp compile spotbugs:check pmd:check \
+            org.owasp:dependency-check-maven:check \
+            -DnvdApiKey=${{ env.NVD_API_KEY }}
+
+      # 3. Сохранение отчётов (существующие + новый)
+      - name: Upload SpotBugs report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-report
+          path: target/spotbugsXml.xml
+          if-no-files-found: ignore
+
+      - name: Upload PMD report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd-report
+          path: target/pmd.xml
+          if-no-files-found: ignore
+
+      # 4. Сохранение отчёта OWASP Dependency-Check
+      - name: Upload OWASP Dependency-Check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: |
+            target/dependency-check-report.html
+            target/dependency-check-report.xml
+          if-no-files-found: ignore
