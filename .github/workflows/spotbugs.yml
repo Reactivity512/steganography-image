@@ -23,8 +23,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Вариант B (быстрее): вызвать цель напрямую, без тестов и packaging.
-       - name: Compile and run SpotBugs
+      - name: Compile and run SpotBugs
          run: mvn -B -ntp compile spotbugs:check
 
       - name: Upload SpotBugs report
