@@ -1,4 +1,4 @@
-name: SpotBugs
+name: Static-analysis
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  spotbugs:
-    name: SpotBugs Analysis
+  static-analysis:
+    name: Static Analysis
     runs-on: ubuntu-latest
 
     steps:
@@ -23,8 +23,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Compile and run SpotBugs
-         run: mvn -B -ntp compile spotbugs:check
+      - name: Compile with Error Prone and run SpotBugs
+        run: mvn -B -ntp compile spotbugs:check
 
       - name: Upload SpotBugs report
         if: always()
