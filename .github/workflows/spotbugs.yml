@@ -5,7 +5,6 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   spotbugs:
@@ -24,7 +23,7 @@ jobs:
           cache: 'maven'
 
       - name: Compile and run SpotBugs
-         run: mvn -B -ntp compile spotbugs:check
+        run: mvn -B -ntp compile spotbugs:check
 
       - name: Upload SpotBugs report
         if: always()
