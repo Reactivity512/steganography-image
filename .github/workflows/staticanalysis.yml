@@ -23,8 +23,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Compile with Error Prone and run SpotBugs
-        run: mvn -B -ntp compile spotbugs:check
+      - name: Compile with Error Prone and run SpotBugs + PMD
+        run: mvn -B -ntp compile spotbugs:check pmd:check
 
       - name: Upload SpotBugs report
         if: always()
@@ -32,4 +32,12 @@ jobs:
         with:
           name: spotbugs-report
           path: target/spotbugsXml.xml
+          if-no-files-found: ignore
+
+      - name: Upload PMD report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd-report
+          path: target/pmd.xml
           if-no-files-found: ignore
