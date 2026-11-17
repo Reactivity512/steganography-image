@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 public class SteganographyImageApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SteganographyImageApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(SteganographyImageApplication.class, args);
+  }
 }

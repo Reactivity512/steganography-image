@@ -6,10 +6,5 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 public record DecodeRequest(
-        @NotNull(message = "Файл изображения не передан")
-        MultipartFile image,
-
-        @NotBlank(message = "Ключ не передан")
-        @ValidKeyLength
-        String key
-) {}
+    @NotNull(message = "Файл изображения не передан") MultipartFile image,
+    @NotBlank(message = "Ключ не передан") @ValidKeyLength String key) {}
