@@ -13,24 +13,24 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class SteganographyController {
 
-    private final SteganographyService service;
+  private final SteganographyService service;
 
-    public SteganographyController(SteganographyService service) {
-        this.service = service;
-    }
+  public SteganographyController(SteganographyService service) {
+    this.service = service;
+  }
 
-    @RequestMapping("/encode")
-    public ResponseEntity<byte[]> encode(@Valid @ModelAttribute EncodeRequest req) {
-        byte[] png = service.encode(req);
+  @RequestMapping("/encode")
+  public ResponseEntity<byte[]> encode(@Valid @ModelAttribute EncodeRequest req) {
+    byte[] png = service.encode(req);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"encoded.png\"")
-                .body(png);
-    }
+    return ResponseEntity.ok()
+        .contentType(MediaType.IMAGE_PNG)
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"encoded.png\"")
+        .body(png);
+  }
 
-    @PostMapping("/decode")
-    public ResponseEntity<String> decode(@Valid @ModelAttribute DecodeRequest req) {
-        return ResponseEntity.ok(service.decode(req));
-    }
+  @PostMapping("/decode")
+  public ResponseEntity<String> decode(@Valid @ModelAttribute DecodeRequest req) {
+    return ResponseEntity.ok(service.decode(req));
+  }
 }

@@ -8,8 +8,4 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "steganography")
 public record SteganographyProperties(
-    @Min(1) @Max(2) int secureLevel,
-    @Min(3) int minKeyBytes,
-    @Min(16) int maxKeyBytes
-) {
-}
+    @Min(1) @Max(2) int secureLevel, @Min(3) int minKeyBytes, @Min(16) int maxKeyBytes) {}
